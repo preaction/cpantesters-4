@@ -1,0 +1,30 @@
+version: '3'
+services:
+    db:
+        image: postgres:13-alpine
+        environment:
+            POSTGRES_PASSWORD: rootpw
+        volumes:
+            - db:/var/lib/postgresql/data
+    web:
+        build: .
+        depends_on:
+            - db
+        environment:
+            OAUTH2_GITHUB_CLIENT: a765a2b1dd2302dc4abd
+            OAUTH2_GITHUB_SECRET: f368e10f53b0587a0e6753a187a537009113d522
+        ports:
+            - '3000:3000'
+    prove:
+        profiles:
+          - test
+        build: .
+        entrypoint: [ "prove", "-lr" ]
+        command: [ "t" ]
+        volumes:
+          - .:/app:ro
+        depends_on:
+            - db
+
+volumes:
+    db:
