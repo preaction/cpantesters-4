@@ -10,8 +10,40 @@ subtest 'create new report' => sub {
         # XXX: Accept report directly from API, removing the need for
         # the extra hashref with a single key?
         report => {
+            tester => {
+                name => 'Doug Bell',
+                email => 'doug@preaction.me',
+            },
+            system => {
+                osname => 'Linux',
+                osversion => '3.2.43',
+                hostname => 'example.com',
+            },
+            language => {
+                name => 'Perl',
+                version => '5.23.4',
+                build => '069b264',
+            },
+            distribution => {
+                name => 'Yancy',
+                version => '1.074',
+            },
+            result => {
+                grade => 'pass',
+                output => {
+                    uncategorized => 'It worked',
+                },
+            },
         },
     });
+
+    isa_ok $row, 'CPAN::Testers::Item::Reports';
+    ok $row->{report_id}, 'id is created';
+    ok $row->{guid}, 'guid is created';
+
+    my $res = $t->pg->db->select( reports => '*', { $row->%{'report_id'} } );
+    is $res->count, 1;
+    ...;
 };
 
 subtest 'load report summary' => sub {
